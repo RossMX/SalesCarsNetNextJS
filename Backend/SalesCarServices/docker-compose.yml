@@ -1,0 +1,12 @@
+services:
+  auctionsdb:
+    image: postgres
+
+  auctions.api:
+    image: ${DOCKER_REGISTRY-}auctionsapi
+    build:
+      context: .
+      dockerfile: src/Services/Auctions/Auctions.API/Dockerfile
+
+volumes:
+  postgresdata:
