@@ -1,7 +1,13 @@
 <Solution>
+  <Folder Name="/BuildingBlocks/">
+    <Project Path="src/BuildingBlocks/BuildingBlocks.Messaging/BuildingBlocks.Messaging.csproj" Id="4dd9ab7b-53c1-4c6a-acfa-2de97fdd0cfb" />
+  </Folder>
   <Folder Name="/Services/" />
   <Folder Name="/Services/Auctions/">
     <Project Path="src/Services/Auctions/Auctions.API/Auctions.API.csproj" />
+  </Folder>
+  <Folder Name="/Services/Search/">
+    <Project Path="src/Services/Search/Search.API/Search.API.csproj" Id="99831cfd-2e23-41f1-9040-039cd858cbc5" />
   </Folder>
   <Project Path="docker-compose.dcproj">
     <Build />

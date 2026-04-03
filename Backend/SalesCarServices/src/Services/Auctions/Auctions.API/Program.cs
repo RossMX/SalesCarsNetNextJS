@@ -1,4 +1,6 @@
+using Auctions.API.Consumers;
 using Auctions.API.Data;
+using MassTransit;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,13 +10,32 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 var dbConnection = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services.AddDbContext<AuctionDbContext>(opt => {
+builder.Services.AddDbContext<AuctionDbContext>(opt =>
+{
     opt.UseNpgsql(dbConnection);
 });
 
 
-builder.Services.AddAutoMapper(cfg => {}, AppDomain.CurrentDomain.GetAssemblies());
+builder.Services.AddAutoMapper(cfg => { }, AppDomain.CurrentDomain.GetAssemblies());
 
+//builder.Services.AddMessageBroker(typeof(AuctionDbContext), Assembly.GetExecutingAssembly());
+builder.Services.AddMassTransit(x =>
+{
+    x.AddEntityFrameworkOutbox<AuctionDbContext>(opt =>
+    {
+        opt.QueryDelay = TimeSpan.FromSeconds(10);
+        opt.UsePostgres();
+        opt.UseBusOutbox();
+    });
+
+    x.AddConsumersFromNamespaceContaining<AuctionCreatedFaultConsumer>();
+    x.SetEndpointNameFormatter(new KebabCaseEndpointNameFormatter("auction", false));
+
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.ConfigureEndpoints(context);
+    });
+});
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 //builder.Services.AddEndpointsApiExplorer();

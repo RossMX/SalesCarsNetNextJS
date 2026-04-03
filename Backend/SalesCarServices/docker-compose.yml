@@ -2,6 +2,12 @@ services:
   auctionsdb:
     image: postgres
 
+  mongodb:
+    image: mongo
+
+  messagebroker:
+    image: rabbitmq:3-management-alpine
+
   auctions.api:
     image: ${DOCKER_REGISTRY-}auctionsapi
     build:
@@ -10,3 +16,4 @@ services:
 
 volumes:
   postgresdata:
+  mongodata:

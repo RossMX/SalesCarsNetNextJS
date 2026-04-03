@@ -12,9 +12,10 @@ public class DbInitializer
 
         if (context.Database.GetPendingMigrations().Any())
         {
-            await context.Database.MigrateAsync();
-            await SeedAuctions(context);
+            await context.Database.MigrateAsync();            
         }
+
+        await SeedAuctions(context);
     }
 
     private static async Task SeedAuctions(AuctionDbContext context)
