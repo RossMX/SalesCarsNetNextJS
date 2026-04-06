@@ -6,8 +6,9 @@ public class CreateAuctionDTO
 {
     [Required]
     public int ReservePrice { get; set; }
-    [Required]
-    public string Seller { get; set; }
+
+    public string? Seller { get; set; }
+    
     [Required]
     public DateTime AuctionEnd { get; set; }
 
