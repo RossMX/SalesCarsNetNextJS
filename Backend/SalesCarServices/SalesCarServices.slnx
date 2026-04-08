@@ -3,6 +3,9 @@
     <Project Path="src/BuildingBlocks/BuildingBlocks.Messaging/BuildingBlocks.Messaging.csproj" Id="4dd9ab7b-53c1-4c6a-acfa-2de97fdd0cfb" />
   </Folder>
   <Folder Name="/Services/" />
+  <Folder Name="/Services/ApiGateway/">
+    <Project Path="src/Services/ApiGateway/ApiGateway/ApiGateway.csproj" Id="d6edbd58-221d-407f-a289-e96a5de0594b" />
+  </Folder>
   <Folder Name="/Services/Auctions/">
     <Project Path="src/Services/Auctions/Auctions.API/Auctions.API.csproj" />
   </Folder>
