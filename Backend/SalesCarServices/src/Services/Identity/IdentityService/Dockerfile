@@ -11,20 +11,19 @@ EXPOSE 8080
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["src/Services/Auctions/Auctions.API/Auctions.API.csproj", "src/Services/Auctions/Auctions.API/"]
-COPY ["src/BuildingBlocks/BuildingBlocks.Messaging/BuildingBlocks.Messaging.csproj", "src/BuildingBlocks/BuildingBlocks.Messaging/"]
-RUN dotnet restore "./src/Services/Auctions/Auctions.API/Auctions.API.csproj"
+COPY ["src/Services/Identity/IdentityService/IdentityService.csproj", "src/Services/Identity/IdentityService/"]
+RUN dotnet restore "./src/Services/Identity/IdentityService/IdentityService.csproj"
 COPY . .
-WORKDIR "/src/src/Services/Auctions/Auctions.API"
-RUN dotnet build "./Auctions.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR "/src/src/Services/Identity/IdentityService"
+RUN dotnet build "./IdentityService.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Auctions.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./IdentityService.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 # This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Auctions.API.dll"]
+ENTRYPOINT ["dotnet", "IdentityService.dll"]

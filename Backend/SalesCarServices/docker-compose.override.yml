@@ -1,6 +1,6 @@
 services:
-  auctionsdb:
-    container_name: auctionsdb
+  postgresdb:
+    container_name: postgresdb
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=postgres
@@ -9,6 +9,12 @@ services:
       - "5432:5432"
     volumes:
       - postgresdata:/var/lib/postgresql
+# Added health-check service
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 3
 
   mongodb:
     container_name: mongodb
@@ -20,6 +26,20 @@ services:
       - "27017:27017"
     volumes:
       - mongodata:/data/db
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mongosh",
+          "--quiet",
+          "127.0.0.1/test",
+          "--eval",
+          "'quit(db.runCommand({ ping: 1 }).ok ? 0 : 2)'",
+        ]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
 
   messagebroker:
     container_name: messagebroker
@@ -27,20 +47,77 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+    healthcheck:
+      test: rabbitmq-diagnostics check_port_connectivity
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   auctions.api:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
-      - ASPNETCORE_HTTP_PORTS=8080
-      - ASPNETCORE_HTTPS_PORTS=8081
-      - ConnectionStrings__PostgreDb=Server=auctionsdb;Port=5432;Database=AuctionsDb;User Id=postgres;Password=postgres;Include Error Detail=true
+      - ASPNETCORE_URLS=http://+:80
+      # - ASPNETCORE_HTTP_PORTS=8080
+      # - ASPNETCORE_HTTPS_PORTS=8081
+      # El host es el nombre del servicio en docker
+      - MessageBroker__Host=messagebroker
+      - ConnectionStrings__DefaultConnection=Server=postgresdb;Port=5432;Database=AuctionsDb;User Id=postgres;Password=postgres;Include Error Detail=true
+      - IdentityServiceUrl=http://identity-svc
     depends_on:
-      - auctionsdb
+      #- messagebroker
+      #- postgresdb
+      # added condition to wait until the depends services are available
+      postgresdb:
+        condition: service_healthy
+      messagebroker:
+        condition: service_healthy
     ports:
-      - "8080"
-      - "8081"
+      - "7001:80"
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+
+  search.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      # - ASPNETCORE_HTTP_PORTS=8080
+      # - ASPNETCORE_HTTPS_PORTS=8081
+      - MessageBroker__Host=messagebroker
+      - ConnectionStrings__MongoDbConnection=mongodb://root:mongopw@mongodb
+      - AuctionServiceBaseUrl=http://auctions.api
+    depends_on:
+      messagebroker:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+    ports:
+      - "7002:80"
+    volumes:
+      - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
+      - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
+      - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
+      - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+
+  identityservice:
+    hostname: identity-svc
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - ASPNETCORE_URLS=http://+:80
+      # - ASPNETCORE_HTTP_PORTS=8080
+      - ConnectionStrings__DefaultConnection=Server=postgresdb;Port=5432;Database=IdentityServerDb;User Id=postgres;Password=postgres;Include Error Detail=true
+    ports:
+      - "5001:80"
+    depends_on:
+      postgresdb:
+        condition: service_healthy
+
+  apigateway:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Docker
+      - ASPNETCORE_URLS=http://+:80
+      # - ASPNETCORE_HTTP_PORTS=8080
+    ports:
+      - "6001:80"

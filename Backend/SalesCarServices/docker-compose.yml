@@ -1,19 +1,40 @@
 services:
-  auctionsdb:
+  postgresdb:
     image: postgres
 
   mongodb:
     image: mongo
 
   messagebroker:
-    image: rabbitmq:3-management-alpine
+    image: rabbitmq:4-management-alpine
 
   auctions.api:
+    # image: <unique_name>/auction-srv:latest 
     image: ${DOCKER_REGISTRY-}auctionsapi
     build:
       context: .
       dockerfile: src/Services/Auctions/Auctions.API/Dockerfile
 
+  search.api:
+    image: ${DOCKER_REGISTRY-}searchapi
+    build:
+      context: .
+      dockerfile: src/Services/Search/Search.API/Dockerfile
+
+  identityservice:
+    image: ${DOCKER_REGISTRY-}identityservice
+    build:
+      context: .
+      dockerfile: src/Services/Identity/IdentityService/Dockerfile
+
+  apigateway:
+    image: ${DOCKER_REGISTRY-}apigateway
+    build:
+      context: .
+      dockerfile: src/Services/ApiGateway/ApiGateway/Dockerfile
+
 volumes:
   postgresdata:
   mongodata:
+
+

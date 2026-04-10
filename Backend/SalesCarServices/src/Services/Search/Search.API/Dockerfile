@@ -5,26 +5,27 @@ FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
+EXPOSE 8081
 
 
 # This stage is used to build the service project
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["src/Services/Auctions/Auctions.API/Auctions.API.csproj", "src/Services/Auctions/Auctions.API/"]
+COPY ["src/Services/Search/Search.API/Search.API.csproj", "src/Services/Search/Search.API/"]
 COPY ["src/BuildingBlocks/BuildingBlocks.Messaging/BuildingBlocks.Messaging.csproj", "src/BuildingBlocks/BuildingBlocks.Messaging/"]
-RUN dotnet restore "./src/Services/Auctions/Auctions.API/Auctions.API.csproj"
+RUN dotnet restore "./src/Services/Search/Search.API/Search.API.csproj"
 COPY . .
-WORKDIR "/src/src/Services/Auctions/Auctions.API"
-RUN dotnet build "./Auctions.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
+WORKDIR "/src/src/Services/Search/Search.API"
+RUN dotnet build "./Search.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Auctions.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "./Search.API.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 # This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Auctions.API.dll"]
+ENTRYPOINT ["dotnet", "Search.API.dll"]
