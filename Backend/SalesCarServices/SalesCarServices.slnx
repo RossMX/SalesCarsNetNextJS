@@ -15,6 +15,10 @@
   <Folder Name="/Services/Search/">
     <Project Path="src/Services/Search/Search.API/Search.API.csproj" Id="99831cfd-2e23-41f1-9040-039cd858cbc5" />
   </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="Tests/AuctionService.IntegrationTests/AuctionService.IntegrationTests/AuctionService.IntegrationTests.csproj" Id="09105067-90f1-494c-972e-7b05342862ff" />
+    <Project Path="Tests/AuctionService.UnitTests/AuctionService.UnitTests.csproj" Id="849c77b6-7670-4b1b-a8fa-6ead445f21a7" />
+  </Folder>
   <Project Path="docker-compose.dcproj">
     <Build />
   </Project>

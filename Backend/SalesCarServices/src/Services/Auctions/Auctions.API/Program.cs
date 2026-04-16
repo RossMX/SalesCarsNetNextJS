@@ -54,6 +54,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 
+// Register services
+builder.Services.AddScoped<IAuctionRepository, AuctionRepository>();
+
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 //builder.Services.AddEndpointsApiExplorer();
@@ -86,3 +89,6 @@ try
 
 
 app.Run();
+
+
+public partial class Program { }
