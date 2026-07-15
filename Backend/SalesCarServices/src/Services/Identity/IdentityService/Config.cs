@@ -67,7 +67,8 @@ namespace IdentityService
                     RequirePkce = false,
                     RedirectUris = {"http://localhost:3000/api/auth/callback/id-server"},
                     AllowOfflineAccess = true,
-                    AccessTokenLifetime = 3600*24*60 // 30 Days
+                    AccessTokenLifetime = 3600*24*60, // 30 Days
+                    AlwaysIncludeUserClaimsInIdToken = true // to get claims easyly in the client without extra request to userinfo endpoint
                 }
             };
     }

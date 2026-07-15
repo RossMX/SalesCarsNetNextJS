@@ -1,6 +1,7 @@
 import { Auction } from "@/types";
 import CountdownTimer from "./CountdownTimer";
 import CardImage from "./CardImage";
+import Link from "next/link";
 
 type Props = {
     auction: Auction;
@@ -8,7 +9,7 @@ type Props = {
 
 export default function AuctionCard( { auction }: Props) {
   return (
-    <a href="#">
+    <Link href={`/auctions/details/${auction.id}`}>
       <div className="relative w-full bg-gray-200 aspect-video rounded-lg overflow-hidden">
         <CardImage auction={auction} />
 
@@ -21,6 +22,6 @@ export default function AuctionCard( { auction }: Props) {
         <p className="font-bold text-sm">{auction.year}</p>
       </div>
       
-    </a>
+    </Link>
   )
 }

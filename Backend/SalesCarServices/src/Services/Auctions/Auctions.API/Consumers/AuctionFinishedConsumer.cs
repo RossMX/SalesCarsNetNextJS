@@ -17,17 +17,20 @@ public class AuctionFinishedConsumer : IConsumer<AuctionFinishedEvent>
     {
         Console.WriteLine("--> Consuming Auction finished event");
 
-        var auction = await _dbContext.Auctions.FindAsync(context.Message.AuctionId);
-
-        if (context.Message.ItemSold)
+        if (Guid.TryParse(context.Message.AuctionId, out var auctionId))
         {
-            auction.Winner = context.Message.Winner;
-            auction.Seller = context.Message.Seller;
+            var auction = await _dbContext.Auctions.FindAsync(auctionId);
+
+            if (context.Message.ItemSold)
+            {
+                auction.Winner = context.Message.Winner;
+                auction.Seller = context.Message.Seller;
+            }
+
+            auction.Status = auction.SoldAmount > auction.ReservePrice
+                ? Entities.Status.Finished : Entities.Status.ReserveNotMet;
+
+            await _dbContext.SaveChangesAsync();
         }
-
-        auction.Status = auction.SoldAmount > auction.ReservePrice
-            ? Entities.Status.Finished : Entities.Status.ReserveNotMet;
-
-        await _dbContext.SaveChangesAsync();
     }
 }

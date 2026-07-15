@@ -9,6 +9,9 @@
   <Folder Name="/Services/Auctions/">
     <Project Path="src/Services/Auctions/Auctions.API/Auctions.API.csproj" />
   </Folder>
+  <Folder Name="/Services/Bidding/">
+    <Project Path="src/Services/Bidding/Bidding.API/Bidding.API.csproj" Id="c3670b6b-6796-48ba-924a-189486659d13" />
+  </Folder>
   <Folder Name="/Services/Identity/">
     <Project Path="src/Services/Identity/IdentityService/IdentityService.csproj" Id="3677d118-a357-4e92-aa54-691da91897b7" />
   </Folder>

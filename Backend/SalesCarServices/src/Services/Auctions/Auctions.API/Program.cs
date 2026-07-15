@@ -1,5 +1,6 @@
 using Auctions.API.Consumers;
 using Auctions.API.Data;
+using Auctions.API.Services;
 using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
@@ -56,7 +57,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 // Register services
 builder.Services.AddScoped<IAuctionRepository, AuctionRepository>();
-
+builder.Services.AddGrpc();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 //builder.Services.AddEndpointsApiExplorer();
@@ -77,8 +78,9 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapGrpcService<GrpcAuctionService>();
 
-
+// Initialize the database and seed data
 try
 {
     await DbInitializer.Seed(app);

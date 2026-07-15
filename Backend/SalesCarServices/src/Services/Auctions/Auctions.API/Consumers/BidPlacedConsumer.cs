@@ -16,15 +16,17 @@ public class BidPlacedConsumer : IConsumer<BidPlacedEvent>
     {
         Console.WriteLine("--> Consuming Bid placed event");
 
-        var auction = await _dbContext.Auctions.FindAsync(context.Message.AuctionId);
-
-        if (auction.CurrentHighBid == null ||
-            context.Message.BidStatus.Contains("Accepted") &&
-            context.Message.Amount > auction.CurrentHighBid)
+        if (Guid.TryParse(context.Message.AuctionId, out var auctionId))
         {
-            auction.CurrentHighBid = context.Message.Amount;
-            await _dbContext.SaveChangesAsync();
-        }
+            var auction = await _dbContext.Auctions.FindAsync(auctionId);
 
+            if (auction.CurrentHighBid == null ||
+                context.Message.BidStatus.Contains("Accepted") &&
+                context.Message.Amount > auction.CurrentHighBid)
+            {
+                auction.CurrentHighBid = context.Message.Amount;
+                await _dbContext.SaveChangesAsync();
+            }
+        }
     }
 }

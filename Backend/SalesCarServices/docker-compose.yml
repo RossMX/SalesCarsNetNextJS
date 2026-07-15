@@ -21,6 +21,12 @@ services:
       context: .
       dockerfile: src/Services/Search/Search.API/Dockerfile
 
+  bidding.api:
+    image: ${DOCKER_REGISTRY-}biddingapi
+    build:
+      context: .
+      dockerfile: src/Services/Bidding/Bidding.API/Dockerfile
+
   identityservice:
     image: ${DOCKER_REGISTRY-}identityservice
     build:
@@ -36,5 +42,6 @@ services:
 volumes:
   postgresdata:
   mongodata:
+
 
 

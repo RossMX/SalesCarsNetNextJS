@@ -57,12 +57,17 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80
+      - ASPNETCORE_URLS=http://+:7777
       # - ASPNETCORE_HTTP_PORTS=8080
       # - ASPNETCORE_HTTPS_PORTS=8081
       # El host es el nombre del servicio en docker
       - MessageBroker__Host=messagebroker
       - ConnectionStrings__DefaultConnection=Server=postgresdb;Port=5432;Database=AuctionsDb;User Id=postgres;Password=postgres;Include Error Detail=true
       - IdentityServiceUrl=http://identity-svc
+      - Kestrel__Endpoints__Grpc__Protocols=Http2
+      - Kestrel__Endpoints__Grpc__Url=http://+:7777
+      - Kestrel__Endpoints__WebApi__Protocols=Http1
+      - Kestrel__Endpoints__WebApi__Url=http://+:80
     depends_on:
       #- messagebroker
       #- postgresdb
@@ -73,6 +78,7 @@ services:
         condition: service_healthy
     ports:
       - "7001:80"
+      - "7777:7777" 
     volumes:
       - ${APPDATA}/Microsoft/UserSecrets:/home/app/.microsoft/usersecrets:ro
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
@@ -100,6 +106,24 @@ services:
       - ${APPDATA}/Microsoft/UserSecrets:/root/.microsoft/usersecrets:ro
       - ${APPDATA}/ASP.NET/Https:/home/app/.aspnet/https:ro
       - ${APPDATA}/ASP.NET/Https:/root/.aspnet/https:ro
+
+  bidding.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      # - ASPNETCORE_HTTP_PORTS=8080
+      # El host es el nombre del servicio en docker
+      - MessageBroker__Host=messagebroker
+      - ConnectionStrings__BidDbConnection=mongodb://root:mongopw@mongodb
+      - IdentityServiceUrl=http://identity-svc
+      - GrpcAuction=http://auctions.api:7777
+    depends_on:
+      messagebroker:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+    ports:
+      - "7003:80"
 
   identityservice:
     hostname: identity-svc
