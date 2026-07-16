@@ -39,9 +39,16 @@ services:
       context: .
       dockerfile: src/Services/ApiGateway/ApiGateway/Dockerfile
 
+  notifications.api:
+    image: ${DOCKER_REGISTRY-}notificationsapi
+    build:
+      context: .
+      dockerfile: src/Services/Notifications/Notifications.API/Dockerfile
+
 volumes:
   postgresdata:
   mongodata:
+
 
 
 

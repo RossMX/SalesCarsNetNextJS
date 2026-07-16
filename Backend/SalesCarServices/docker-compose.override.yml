@@ -111,8 +111,6 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ASPNETCORE_URLS=http://+:80
-      # - ASPNETCORE_HTTP_PORTS=8080
-      # El host es el nombre del servicio en docker
       - MessageBroker__Host=messagebroker
       - ConnectionStrings__BidDbConnection=mongodb://root:mongopw@mongodb
       - IdentityServiceUrl=http://identity-svc
@@ -124,6 +122,17 @@ services:
         condition: service_healthy
     ports:
       - "7003:80"
+
+  notifications.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:80
+      - MessageBroker__Host=messagebroker
+    depends_on:
+      messagebroker:
+        condition: service_healthy
+    ports:
+      - "7004:80"
 
   identityservice:
     hostname: identity-svc

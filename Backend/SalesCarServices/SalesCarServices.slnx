@@ -15,6 +15,9 @@
   <Folder Name="/Services/Identity/">
     <Project Path="src/Services/Identity/IdentityService/IdentityService.csproj" Id="3677d118-a357-4e92-aa54-691da91897b7" />
   </Folder>
+  <Folder Name="/Services/Notifications/">
+    <Project Path="src/Services/Notifications/Notifications.API/Notifications.API.csproj" Id="bbd3a1c8-12fb-41ff-a2bd-b07c8ac7b39f" />
+  </Folder>
   <Folder Name="/Services/Search/">
     <Project Path="src/Services/Search/Search.API/Search.API.csproj" Id="99831cfd-2e23-41f1-9040-039cd858cbc5" />
   </Folder>
