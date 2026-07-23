@@ -2,7 +2,6 @@
 
 import AuctionCard from "./AuctionCard";
 import AppPagination from "../components/AppPagination";
-import { Auction, PagedResult } from "@/types";
 import { useEffect, useState } from "react";
 import { getData } from "../actions/auctionsActions";
 import Filters from "./Filters";
@@ -10,6 +9,7 @@ import { useParamsStore } from "@/hooks/useParamsStore";
 import { useShallow } from "zustand/shallow";
 import qs from "query-string";
 import EmptyFilter from "../components/EmptyFilter";
+import { useAuctionStore } from "@/hooks/useAuctionStore";
 
 export default function Listing() {
   //const [auctions, setAuctions] = useState<Auction[]>([]);
@@ -17,7 +17,17 @@ export default function Listing() {
   // const [pageNumber, setPageNumber] = useState(1);
   // const [pageSize, setPageSize] = useState(4);
 
-  const [data, setData] = useState<PagedResult<Auction>>();
+  //const [data, setData] = useState<PagedResult<Auction>>();
+
+  const [loading, setLoading] = useState(true);
+
+  const data = useAuctionStore(useShallow(state => ({
+    auctions: state.auctions,
+    totalCount: state.totalCount,
+    pageCount: state.pageCount
+  })));
+
+  const setData = useAuctionStore(state => state.setData);
 
   const params = useParamsStore(useShallow(state => ({
     pageNumber: state.pageNumber,
@@ -42,12 +52,13 @@ export default function Listing() {
 
   useEffect(() => {
     getData(url).then(data => {
-      console.log(data);
+      //console.log(data);
       setData(data);
+      setLoading(false);
     })
-  }, [url]);
+  }, [url, setData]);
 
-  if (!data) {
+  if (loading) {
     return <div>Loading...</div>;
   }
 
@@ -60,13 +71,13 @@ export default function Listing() {
       ) : (
         <>
           <div className=" grid grid-cols-4 gap-6">
-            {data && data.results.map(auction => (
+            {data && data.auctions.map(auction => (
               <AuctionCard key={auction.id} auction={auction} />
             ))}
           </div>
 
           <div className="flex justify-center mt-4">
-            {data.results.length > 0 && (
+            {data.auctions.length > 0 && (
               <AppPagination
                 currentPage={params.pageNumber}
                 pageCount={data.pageCount}
