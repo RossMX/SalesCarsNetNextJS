@@ -399,3 +399,4 @@ FodyWeavers.xsd
 src/Services/Discount/Discount.Grpc/discountdb
 
 .DS_Store
+/Backend/SalesCarServices/src/Services/Identity/IdentityService/keys
